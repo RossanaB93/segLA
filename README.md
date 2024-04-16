@@ -5,6 +5,7 @@
 - Run 'createDatasetJson_with_cross_validation_scheme.py' (Transformed = True) to get the dataset_LA_transf_cross_val_fold_k.json
 - Run 'LASegmentation_with_cross_validation.py' to train the net with Kfold=0, Kfold=1, Kfold=2, Kfold=3, Kfold=4 changing output directory name
 - Run 'test_LAsegmentation_with_cross_validation.py' to segment the test dataset with the trained net at each fold.
+- Run 'metrics_test.py' to compute the metrics, such as the volumetric Dice score, the Precision, and the Recall of the test set for each fold.
 
 ### read_and_write_cross_validation_scheme.py
 Input: a .csv file with a table containing "Training", "Validation", or "Test" for each patient depending on the current fold. This script is for balancing the dataset, thus guaranteeing that at the end of the five folds the 10 phases of the CTs gated are equally processed by the UNet (there's no imbalance, such as 10 cases of 60% and 90 of 40%). The csv files is compiled upstreamly depending on the nummber and tha characteristics of the dataset.
@@ -39,11 +40,15 @@ Output files:
 •	.png -> plot of loss function (training) and Dice coefficient (validation) as loss_and_dice.png
 •	.txt files -> saved metrics (Dice coefficient, Hausdorff distance...)
 
-### data_with_cross_validation_scheme.py
-some helper function to manage data and other stuff. 
-
 ### test_LAsegmentation_with_cross_validation.py
 test_LAsegmentation_with_cross_validation.py do segmentations of the test dataset for each fold, based on the best_metric_model.pth (parameters of the U-net).
+
+### metrics_test.py
+Compute the volumetric Dice score, Precision, and Recall for the test set of each fold. 
+Output: a csv file containing a table with the before mentioned scores. Additionally, the script immediately print the values for each patient and also the mean values.
+
+### data_with_cross_validation_scheme.py
+some helper function to manage data and other stuff. 
 
 ### notes
 uses monai 1.2.0 installed using
