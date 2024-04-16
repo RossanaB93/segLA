@@ -1,9 +1,15 @@
 ### Workflow
+- Run 'read_and_write_cross_validation_scheme.py' to produce csv files containing the IDs of the patients to be included in the training, validation, and test sets at each fold
 - Run 'createDatasetJson_with_cross_validation_scheme.py' (Transformed = False) to get the dataset_LA_cross_val_fold_k.json
 - Run 'transformDataset.py' to apply trasnformations (cropping, resampling...) to the dataset (volume and segmentation)
 - Run 'createDatasetJson_with_cross_validation_scheme.py' (Transformed = True) to get the dataset_LA_transf_cross_val_fold_k.json
 - Run 'LASegmentation_with_cross_validation.py' to train the net with Kfold=0, Kfold=1, Kfold=2, Kfold=3, Kfold=4 changing output directory name
 - Run 'test_LAsegmentation_with_cross_validation.py' to segment the test dataset with the trained net at each fold.
+
+### read_and_write_cross_validation_scheme.py
+Input: a .csv file with a table containing "Training", "Validation", or "Test" for each patient depending on the current fold. This script is for balancing the dataset, thus guaranteeing that at the end of the five folds the 10 phases of the CTs gated are equally processed by the UNet (there's no imbalance, such as 10 cases of 60% and 90 of 40%). The csv files is compiled upstreamly depending on the nummber and tha characteristics of the dataset.
+
+Output: three csv files containing the IDs of the patient for the training, validation, and test of each fold.
 
 ### createDatasetJson_with_cross_validation_scheme.py
 Create a .json file with all metadata about the dataset. In the .json file there will be:
@@ -34,10 +40,10 @@ Output files:
 •	.txt files -> saved metrics (Dice coefficient, Hausdorff distance...)
 
 ### data_with_cross_validation_scheme.py
-some helper function to manage data and other stuff
+some helper function to manage data and other stuff. 
 
 ### test_LAsegmentation_with_cross_validation.py
-test_LAsegmentation_with_cross_validation.py do segmentations of a dataset, based on the best_metric_model.pth (parameters of the U-net).
+test_LAsegmentation_with_cross_validation.py do segmentations of the test dataset for each fold, based on the best_metric_model.pth (parameters of the U-net).
 
 ### notes
 uses monai 1.2.0 installed using
@@ -46,3 +52,4 @@ conda create --name monai python=3.8
 conda activate monai
 pip install 'monai[all]'
 ```
+if an error is given, such as "monai not found", then change interpreter, and choose python 3.8.18 (always check the virtual environment!)
