@@ -58,3 +58,5 @@ conda activate monai
 pip install 'monai[all]'
 ```
 if an error is given, such as "monai not found", then change interpreter, and choose python 3.8.18 (always check the virtual environment!)
+
+IMPORTANT! First finish the training with the 5-fold cross-validation then test each fold. Otherwise, the transformation performed with "transformDataset.py" must be run again!
