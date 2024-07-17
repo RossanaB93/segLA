@@ -36,9 +36,9 @@ After the transforms run the createDatasetJson_with_cross_validation_scheme.py w
 LAsegmentation_with_cross_validation.py trains a 3D U-net neural network on a given dataset. 
 
 Output files:
-•	.pth -> Best metric model saved as best_metric_model.pth
-•	.png -> plot of loss function (training) and Dice coefficient (validation) as loss_and_dice.png
-•	.txt files -> saved metrics (Dice coefficient, Hausdorff distance...)
+- .pth -> Best metric model saved as best_metric_model.pth
+- .png -> plot of loss function (training) and Dice coefficient (validation) as loss_and_dice.png
+- .txt files -> saved metrics (Dice coefficient, Hausdorff distance...)
 
 ### test_LAsegmentation_with_cross_validation.py
 test_LAsegmentation_with_cross_validation.py do segmentations of the test dataset for each fold, based on the best_metric_model.pth (parameters of the U-net).
@@ -62,14 +62,14 @@ if an error is given, such as "monai not found", then change interpreter, and ch
 IMPORTANT! First finish the training with the 5-fold cross-validation then test each fold. Otherwise, the transformation performed with "transformDataset.py" must be run again!
 
 ### folders actually uploaded
-•	balanced_dataset -> 60 patients with one phase each! This was the dataset for the stratified k-fold cross-validation
-•	balanced_dataset_all_phases -> 60 patients woth ten phases each! This was the complete dataset for the extraction of the volumes for the SR vs. FIB classification
-•	balanced_dataset_lcx -> equal to "balanced_dataset" but the ground truth has also the circumflex
-•	dataset -> Ilaria's thesis runnings
-•	dataset_for_SR_FIB_classification -> 10 pilot patients for the first experiment on the classification SR vs. FIB (clustering)
-•	RUNS -> Ilaria's thesis old runs
-•	RUNS_all_data -> runs on all the dataset in "balanced dataset" but without cross-validation
-•	RUNS_cross_validation_rossana -> runs on the cross-validation on "balanced_dataset"
+- balanced_dataset -> 60 patients with one phase each! This was the dataset for the stratified k-fold cross-validation
+- balanced_dataset_all_phases -> 60 patients woth ten phases each! This was the complete dataset for the extraction of the volumes for the SR vs. FIB classification
+- balanced_dataset_lcx -> equal to "balanced_dataset" but the ground truth has also the circumflex
+- dataset -> Ilaria's thesis runnings
+- dataset_for_SR_FIB_classification -> 10 pilot patients for the first experiment on the classification SR vs. FIB (clustering)
+- RUNS -> Ilaria's thesis old runs
+- RUNS_all_data -> runs on all the dataset in "balanced dataset" but without cross-validation
+- RUNS_cross_validation_rossana -> runs on the cross-validation on "balanced_dataset"
 
 
 
