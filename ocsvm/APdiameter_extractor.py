@@ -97,8 +97,8 @@ def calcola_diametro(ct_nifti, file_nifti, valore_atrio_sinistro):
     return max_distance * vox_dims[0], index_max
 
 
-dirname = '/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset_all_phases/segmentations'
-dirname_ct = '/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset_all_phases/'
+dirname = '/home/your_dataset_path/segmentations'
+dirname_ct = '/home/your_dataset_path/'
 
 
 p = Path(dirname)
@@ -118,6 +118,3 @@ for subfolder_path in folders_paths:
 
 df = pd.DataFrame({"Diametro_AP_Atrio_Sinistro_mm": diametro_list})
 df.to_csv("diameters_ap.csv")
-
-ct_nifti = '/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset_all_phases/Paz_34/CT_nifti/fase_0 - 859117_Paz_34.nii.gz'
-file_nifti = '/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset_all_phases/segmentations/Paz_34/nii_output_res/fase_0 - 859117_Paz_34_seg.nii.gz'
