@@ -12,19 +12,19 @@ import data
 import vtk
 import nibabel as nb
 
-os.chdir(r"/mnt/Dati2/Ilaria Network/CODICE PYTHON/") 
+os.chdir(r"/home/your_working_directory/") 
 kfold = 3
 ## ======================== Datalist =================================
-dataRoot = osp.realpath('balanced_dataset')
+dataRoot = osp.realpath('/home/your_dataset')
 datasetFilename = f'dataset_LA_cross_val_fold_{kfold}.json'
 
 # # IMPORTANTE !! : cambiare nome logs e logs_segm
-TRIAL_ROOT = osp.realpath('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset/RUNS')
+TRIAL_ROOT = osp.realpath('/home/your_dataset_path/RUNS')
 logs= f'log_K{kfold}_cross-val_E500_w128'   #folder of the .pth file
 logdir = osp.join(TRIAL_ROOT, logs)
 metric_model = 'best_metric_model.pth'  #name of the .pth filep
 state_dict_path=os.path.join(logdir, metric_model)
-SEGM_ROOT = osp.realpath('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset')
+SEGM_ROOT = osp.realpath('/home/your_dataset_path')
 logs_segm= f'test_K{kfold}_E500' #output segmentation folder
 out_name_vtp = 'vtp_output_res'
 out_name_stl = 'stl_output_res'
@@ -73,7 +73,7 @@ datalist = data.load_datalist(
 keys = ['image']
 monai.utils.misc.set_determinism(seed=218341029)
 
-os.chdir(r"/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset") #qui cambiare il nome della cartella del paziente corrente
+os.chdir(r"/home/your_dataset_path") #qui cambiare il nome della cartella del paziente corrente
 #eventualmente fare ciclo for sui pazienti
 trans = monai.transforms.Compose([
     monai.transforms.LoadImaged(keys),
@@ -155,7 +155,7 @@ inferer = monai.inferers.SlidingWindowInferer(
 for ii, data_ in enumerate(loader):
     print('ATTENZIONE: ', data_['name'][0])
     print(f"segmenting patient {ii}/{len(loader)} {data_['name']}")
-    print('NIFTI PATH: ', os.path.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['name'][0]))
+    print('NIFTI PATH: ', os.path.join('/home/your_dataset_path',data_['name'][0]))
     #img_path = glob.glob
     #img_path = os.path.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['image'][0],'/CT_nifti/',f'*_transf.nii.gz')
     #img_nii = nb.load(data_['image'])
@@ -176,9 +176,9 @@ for ii, data_ in enumerate(loader):
 
     ## ======================== Out directories =================================
     #dirOut_vtp = osp.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['name'][0],SEGM_ROOT, logs_segm, out_name_vtp)
-    dirOut_vtp = osp.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['name'][0], logs_segm, out_name_vtp)
-    dirOut_nii = osp.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['name'][0], logs_segm, out_name_nii)
-    dirOut_stl = osp.join('/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset',data_['name'][0], logs_segm, out_name_stl)
+    dirOut_vtp = osp.join('/home/your_dataset_path',data_['name'][0], logs_segm, out_name_vtp)
+    dirOut_nii = osp.join('/home/your_dataset_path',data_['name'][0], logs_segm, out_name_nii)
+    dirOut_stl = osp.join('/home/your_dataset_path',data_['name'][0], logs_segm, out_name_stl)
 
     print(dirOut_vtp)
     if osp.exists(dirOut_vtp): 
