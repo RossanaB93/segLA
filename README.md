@@ -32,7 +32,7 @@ Create a transformed version of the dataset. Trasformations can include
 - etc.
 After the transforms run the createDatasetJson_with_cross_validation_scheme.py with the option ‘Transformed=True’ to create the .json file of the transformed dataset.
 
-### LAsegmentation_with_cross_validation.py*
+### segLA_cross_validation.py*
 LAsegmentation_with_cross_validation.py trains a 3D U-net neural network on a given dataset. 
 
 Output files:
