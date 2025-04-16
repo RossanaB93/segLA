@@ -147,7 +147,6 @@ for kfold in range(folds):
 
     dataRoot = osp.realpath('balanced_dataset') #fornisce la posizione reale di dataset nel sistema
     datasetFilename = f'dataset_LA_transf_cross_val_fold_{kfold}.json'
-    os.chdir(r'/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset')
     print(osp.join(dataRoot,datasetFilename))
     trialdir = 'RUNS' # cartella in cui vanno i risultati della rete
     logs = f'log_K{kfold}_cross-val_E500_w128'  # sottocartelle di cui devo cambiare il nome ogni volta che runno con parametri diversi o diverso kfold
