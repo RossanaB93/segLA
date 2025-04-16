@@ -48,7 +48,7 @@ for fold in range(folds):
     ordered_names_test = ordered_names_test[1:] #così escludo i nomi delle colonne del csv file
     #print("Ordered Names:", ordered_names)
 
-    os.chdir(r'/your_working_path/')
+    os.chdir(r'/home/your_working_path/')
     with open('datasetTemplate_LA.json') as json_file:
         data = json.load(json_file)
 
@@ -136,7 +136,7 @@ for fold in range(folds):
         output_filename = baseDir / fr'dataset_LA_cross_val_fold_{fold}.json'
     else:
         output_filename = baseDir / fr'dataset_LA_transf_cross_val_fold_{fold}.json'
-    os.chdir(r"/your_dataset_path/")
+    os.chdir(r"/home/your_dataset_path/")
 
     with open(output_filename, 'w') as outfile:
         outfile.write(json_string)
