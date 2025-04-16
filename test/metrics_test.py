@@ -57,14 +57,14 @@ def recall_score(predicted, target, smooth=1):
     return recall
 
 # path to the test data
-dataRoot = r"/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset"
+dataRoot = r"/home/your_dataset_path/"
 # set current dir
 os.chdir(dataRoot) 
 # choose the current fold
 kfold = 1
 
 # from the csv with the IDs of the patients of the test set for each fold to a dataframe
-df = pd.read_csv(fr'/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset/test_elements_fold_{kfold}.csv')
+df = pd.read_csv(fr'/home/your_dataset_path/test_elements_fold_{kfold}.csv')
 n_test_samples = len(df)
 
 metrics_list =[]
