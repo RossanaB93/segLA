@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-cross_validation_scheme_path = r"/mnt/Dati2/Ilaria Network/CODICE PYTHON/balanced_dataset/UNet_all_phases_LAA_db.csv"    
+cross_validation_scheme_path = r"/.../your_LAA_db.csv"    
 #cross_validation_scheme_path = r"/mnt/Dati2/Ilaria Network/CODICE PYTHON/dataset/3D_UNet_LAA_db.csv"    
 pat_folds = pd.read_csv(cross_validation_scheme_path, sep=",")
 folds = 5
