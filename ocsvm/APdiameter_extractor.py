@@ -1,120 +1,126 @@
-import nibabel as nib
-import numpy as np
-import os 
-import cv2
-import numpy as np
+# ==========================================
+# Imports
+# ==========================================
+import os
 from pathlib import Path
-from scipy.spatial import distance
-from scipy.ndimage import label
-import matplotlib.pyplot as plt
-import pandas as pd
 
-valore_atrio_sinistro = 1  # Valore che rappresenta l'atrio sinistro nel file
-
-# All subdirectories in the current directory, not recursive.
-def scan_dir(path):
-    subfolders = [f for f in path.iterdir() if f.is_dir()]
-    return subfolders
-
-import nibabel as nib
-import numpy as np
 import cv2
-from scipy.spatial import distance
-from skimage.measure import label
+import numpy as np
+import nibabel as nib
+import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.spatial import distance
 
-def calcola_diametro(ct_nifti, file_nifti, valore_atrio_sinistro):
+# ==========================================
+# Constants
+# ==========================================
+LEFT_ATRIUM_LABEL = 1  # Label value for the left atrium in the segmentation
+
+# ==========================================
+# Utility functions
+# ==========================================
+
+def scan_dir(path: Path):
+    """Returns the list of subdirectories in the given path."""
+    return [f for f in path.iterdir() if f.is_dir()]
+
+def calculate_ap_diameter(ct_nifti_path, seg_nifti_path, atrium_label):
     """
-    Calcola il diametro antero-posteriore (AP) dell'atrio sinistro da un file NIfTI e visualizza le slice
-    della superficie anteriore e posteriore.
+    Calculates the anterior-posterior (AP) diameter of the left atrium in a NIfTI image.
 
-    :param ct_nifti: percorso del file NIfTI contenente l'immagine CT
-    :param file_nifti: percorso del file NIfTI contenente la segmentazione
-    :param valore_atrio_sinistro: valore nella segmentazione corrispondente all'atrio sinistro
-    :return: diametro antero-posteriore (AP) in millimetri
+    Parameters:
+        ct_nifti_path (str): Path to the CT image (NIfTI)
+        seg_nifti_path (str): Path to the segmentation file (NIfTI)
+        atrium_label (int): Label value of the left atrium
+
+    Returns:
+        tuple: (max_diameter_mm, slice_index)
     """
-    # Carica il file NIfTI del CT e della segmentazione
-    img_ct = nib.load(ct_nifti)
-    data_ct = img_ct.get_fdata()
-    img = nib.load(file_nifti)
-    header = img.header
-    vox_dims = header.get_zooms()
-    data = img.get_fdata()
-    n_slices_z = data.shape[2]
-    slice_maggiore_start = 0  # Inizializza il diametro
+    # Load NIfTI files
+    ct_img = nib.load(ct_nifti_path)
+    ct_data = ct_img.get_fdata()
 
-    # Trova la slice con il maggiore valore per l'atrio sinistro
-    for i in range(n_slices_z):
-        slice_data = data[:, :, i]
-        
-        if slice_data.sum() == 0:
-            continue  # Salta le slice vuote
+    seg_img = nib.load(seg_nifti_path)
+    seg_data = seg_img.get_fdata()
+    voxel_spacing = seg_img.header.get_zooms()
 
-        # Crea una maschera binaria per l'atrio sinistro
-        binary_slice = (slice_data == valore_atrio_sinistro).astype(int)
+    max_area = 0
+    best_slice_index = 0
 
-        # Trova le componenti connesse (labels)
-        # num_components, labels = label(binary_slice)
+    # Find slice with largest LA area
+    for i in range(seg_data.shape[2]):
+        binary_mask = (seg_data[:, :, i] == atrium_label).astype(np.uint8)
+        area = binary_mask.sum()
+        if area > max_area:
+            max_area = area
+            best_slice_index = i
 
-        # if labels > 1:
-        #     continue
+    # Prepare binary mask for contour detection
+    binary_slice = (seg_data[:, :, best_slice_index] == atrium_label).astype(np.uint8) * 255
+    contours, _ = cv2.findContours(binary_slice, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        slice_maggiore = slice_data.sum()
-        if slice_maggiore > slice_maggiore_start:
-            slice_maggiore_start = slice_maggiore
-            index_max = i
+    if not contours:
+        return 0.0, best_slice_index  # No segmentation found
 
-    # Binario per la slice con la massima area
-    binary_slice_8bit = (data[:,:,index_max] > 0).astype(np.uint8) * 255
+    largest_contour = max(contours, key=cv2.contourArea)
 
-    # Trova i contorni
-    contours, _ = cv2.findContours(binary_slice_8bit, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contour = max(contours, key=cv2.contourArea)
-
-    # Trova la distanza massima tra i punti del contorno
+    # Compute max Euclidean distance between any two points on the contour
     max_distance = 0
-    for i in range(len(contour)):
-        for j in range(i + 1, len(contour)):
-            dist = distance.euclidean(contour[i][0], contour[j][0])
+    max_points = ((0, 0), (0, 0))
+
+    for i in range(len(largest_contour)):
+        for j in range(i + 1, len(largest_contour)):
+            dist = distance.euclidean(largest_contour[i][0], largest_contour[j][0])
             if dist > max_distance:
-                max_distance = dist 
-                max_points = (contour[i][0], contour[j][0])
+                max_distance = dist
+                max_points = (largest_contour[i][0], largest_contour[j][0])
 
-    # Overlay della segmentazione e del diametro
-    ct_slice = data_ct[:, :, index_max]
-    img_overlay = cv2.cvtColor(ct_slice.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-    cv2.drawContours(img_overlay, [contour], -1, (0, 255, 0), 2)
-    cv2.line(img_overlay, tuple(max_points[0]), tuple(max_points[1]), (255, 0, 0), 2)
+    # Convert to mm using pixel spacing
+    diameter_mm = max_distance * voxel_spacing[0]
+    return diameter_mm, best_slice_index
 
-    # Visualizza immagine con overlay della segmentazione e diametro
-    plt.figure(figsize=(10, 10))
-    plt.imshow(cv2.cvtColor(img_overlay, cv2.COLOR_BGR2RGB))
-    plt.title("CT Slice with Segmentation and Diameter")
-    plt.axis("off")
-    plt.show()
+# ==========================================
+# Main execution
+# ==========================================
 
-    # Ritorna il diametro massimo in millimetri
-    return max_distance * vox_dims[0], index_max
+# Set dataset paths
+segmentation_root = Path("/home/your_dataset_path/segmentations")
+ct_root = Path("/home/your_dataset_path")
 
-
-dirname = '/home/your_dataset_path/segmentations'
-dirname_ct = '/home/your_dataset_path/'
-
-
-p = Path(dirname)
-folders_paths = [f for f in p.iterdir() if f.is_dir()]
+# Scan subject directories
+subject_dirs = scan_dir(segmentation_root)
 
 phase0_list = []
-diametro_list = []
+diameter_list = []
 
-for subfolder_path in folders_paths:
-    segs = scan_dir(subfolder_path)
-    all_phases = os.listdir(segs[0])
-    phase0_list.append(all_phases[0])
+for subject_dir in subject_dirs:
+    seg_folders = scan_dir(subject_dir)
+    if not seg_folders:
+        continue
+    
+    first_phase_files = os.listdir(seg_folders[0])
+    if not first_phase_files:
+        continue
 
-    file_nifti = str(segs[0])+'/'+str(all_phases[0])
-    diametro_list.append(calcola_diametro(file_nifti, valore_atrio_sinistro))
-    print(f"Diametro antero-posteriore dell'atrio sinistro: {calcola_diametro(ct_nifti,file_nifti, valore_atrio_sinistro)} mm")
+    seg_file_path = seg_folders[0] / first_phase_files[0]
+    ct_file_path = ct_root / subject_dir.name / "phase0.nii.gz"  # Adjust this if needed
 
-df = pd.DataFrame({"Diametro_AP_Atrio_Sinistro_mm": diametro_list})
-df.to_csv("diameters_ap.csv")
+    if not ct_file_path.exists():
+        print(f"Missing CT for {ct_file_path}")
+        continue
+
+    try:
+        diameter_mm, slice_index = calculate_ap_diameter(str(ct_file_path), str(seg_file_path), LEFT_ATRIUM_LABEL)
+        phase0_list.append(first_phase_files[0])
+        diameter_list.append(diameter_mm)
+        print(f"{subject_dir.name}: AP diameter = {diameter_mm:.2f} mm (slice {slice_index})")
+    except Exception as e:
+        print(f"Error processing {subject_dir.name}: {e}")
+
+# Save results
+output_df = pd.DataFrame({
+    "Phase0_File": phase0_list,
+    "Diametro_AP_Atrio_Sinistro_mm": diameter_list
+})
+output_df.to_csv("diameters_ap.csv", index=False)
+print("Saved diameters to diameters_ap.csv")
