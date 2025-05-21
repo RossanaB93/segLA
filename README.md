@@ -3,7 +3,7 @@
 - Run 'createDatasetJson_with_cross_validation_scheme.py' (Transformed = False) to get the dataset_LA_cross_val_fold_k.json
 - Run 'transformDataset.py' to apply trasnformations (cropping, resampling...) to the dataset (volume and segmentation)
 - Run 'createDatasetJson_with_cross_validation_scheme.py' (Transformed = True) to get the dataset_LA_transf_cross_val_fold_k.json
-- Run 'LASegmentation_with_cross_validation.py' to train the net with Kfold=0, Kfold=1, Kfold=2, Kfold=3, Kfold=4 changing output directory name
+- Run 'segLA_cross_validation.py' to train the net with Kfold=0, Kfold=1, Kfold=2, Kfold=3, Kfold=4 changing output directory name
 - Run 'test_LAsegmentation_with_cross_validation.py' to segment the test dataset with the trained net at each fold.
 - Run 'metrics_test.py' to compute the metrics, such as the volumetric Dice score, the Precision, and the Recall of the test set for each fold.
 
