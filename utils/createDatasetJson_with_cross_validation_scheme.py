@@ -10,7 +10,7 @@ dataset_path = r"/home/your_dataset_path/"
 transformed = False
 
 baseDir = Path(dataset_path)
-patient_dirs = list(baseDir.glob('*')) # crea una lista di oggetti path
+patient_dirs = list(baseDir.glob('*')) # create path object list
 patient_dirs = [dir_ for dir_ in patient_dirs if dir_.is_dir()]
 
 print(patient_dirs)
@@ -140,7 +140,3 @@ for fold in range(folds):
 
     with open(output_filename, 'w') as outfile:
         outfile.write(json_string)
-
-# Da riprendere per questo codice
-# 3) controllare bene tutto e fare una copia di LAsegmentation per adattarla a una k-fold cross-validation controllata (e togliere il rumore gaussiano dalla data_augmentation)
-# 4) capire cosa fa Transformed=True: è necessario?
